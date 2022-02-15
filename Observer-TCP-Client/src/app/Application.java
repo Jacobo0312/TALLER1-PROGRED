@@ -11,7 +11,7 @@ public class Application implements TCPConnection.OnMessageListener{
     private  TCPConnection tcpConnection;
 
     public Application(){
-        this.tcpConnection=new TCPConnection(); 
+        this.tcpConnection=TCPConnection.getInstance(); 
         tcpConnection.setPort(5000);
         tcpConnection.setIp("127.0.0.1");
         tcpConnection.setListener(this);

@@ -1,18 +1,41 @@
 
 package comm;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
 public class TCPConnection extends Thread {
+
+     //Singleton
+
+     private static TCPConnection instance=null;
+
+     private TCPConnection (){}
+ 
+ 
+     public static synchronized TCPConnection getInstance(){
+ 
+         if (instance==null){
+             instance=new TCPConnection();
+         }
+         
+         return instance;
+
+     }
+     
+
+
 
     private Socket socket;
     private String ip;
     private int port;
     private OnMessageListener listener;
     BufferedWriter bw;
+    BufferedReader br;
 
     public void setPort(int port) {
         this.port = port;
@@ -29,6 +52,7 @@ public class TCPConnection extends Thread {
             socket = new Socket(ip, port);
             listener.showMessage("Connect");
             bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            br=new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -39,7 +63,8 @@ public class TCPConnection extends Thread {
             try {
                 bw.write(line + "\n");
                 bw.flush();
-                listener.showMessage("Sent message");
+                String message=br.readLine();
+                listener.showMessage(message);
             } catch (IOException e) {
                 e.printStackTrace();
             }

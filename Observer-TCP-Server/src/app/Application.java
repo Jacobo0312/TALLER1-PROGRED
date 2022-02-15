@@ -10,7 +10,7 @@ public class Application implements TCPConnection.OnMessageListener,OnByeListene
     private  TCPConnection tcpConnection;
 
     public Application(){
-        this.tcpConnection=new TCPConnection(); 
+        this.tcpConnection=TCPConnection.getInstance(); 
         tcpConnection.setListener(this);
         tcpConnection.setOnBye(this);
         tcpConnection.setPort(5000);
