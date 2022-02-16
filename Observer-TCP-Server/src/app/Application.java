@@ -1,19 +1,16 @@
 package app;
 
-import java.io.IOException;
 
 import comm.TCPConnection;
-import comm.TCPConnection.OnByeListener;
+import event.*;
 
-public class Application implements TCPConnection.OnMessageListener,OnByeListener{
+public class Application implements OnInterfaceListener,OnIpListener,OnRTTListener,OnTimeListener,OnSpeedListener{
 
     private  TCPConnection tcpConnection;
 
     public Application(){
         this.tcpConnection=TCPConnection.getInstance(); 
-        tcpConnection.setListener(this);
-        tcpConnection.setOnBye(this);
-        tcpConnection.setPort(5000);
+        tcpConnection.subscribe(this);
     }
 
 
@@ -22,22 +19,45 @@ public class Application implements TCPConnection.OnMessageListener,OnByeListene
     }
 
 
-
     @Override
-    public void onMessage(String message) {
-       System.out.println(message);
-    }
-
-
-    @Override
-    public void onBye() {
-        try {
-            tcpConnection.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    public void onSpeed() {
+        // TODO Auto-generated method stub
         
     }
+
+
+    @Override
+    public void OnTime() {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+    @Override
+    public void onRTT() {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+    @Override
+    public void onIp() {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+    @Override
+    public void OnInterface() {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+
+  
+
+
+ 
     
 }

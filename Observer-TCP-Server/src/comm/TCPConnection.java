@@ -3,38 +3,34 @@ package comm;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
+
+import app.Application;
+import event.*;
 
 public class TCPConnection extends Thread {
-     
-    //Singleton
 
-    private static TCPConnection instance=null;
+    // Singleton
 
-    private TCPConnection (){}
+    private static TCPConnection instance = null;
 
+    private TCPConnection() {
+    }
 
+    public static synchronized TCPConnection getInstance() {
 
-    public static synchronized TCPConnection getInstance(){
-
-        if (instance==null){
-            instance=new TCPConnection();
+        if (instance == null) {
+            instance = new TCPConnection();
         }
-        
 
         return instance;
 
-
     }
 
-
-
-    //-------------------------------
+    // -------------------------------
 
     private ServerSocket server;
     private Socket socket;
@@ -42,13 +38,38 @@ public class TCPConnection extends Thread {
     BufferedReader br;
     BufferedWriter bw;
 
-
-    public OnMessageListener listener;
-    public OnByeListener byeListener;
-
     public void setPort(int port) {
         this.port = port;
     }
+
+    // Observer
+    public OnSpeedListener onSpeedListener;
+    public OnInterfaceListener onInterfaceListener;
+    public OnTimeListener onTimeListener;
+    public OnIpListener onIpListener;
+    public OnRTTListener onRTTListener;
+
+    public void setOnSpeedListener(OnSpeedListener onSpeedListener) {
+        this.onSpeedListener = onSpeedListener;
+    }
+
+    public void setOnInterfaceListener(OnInterfaceListener onInterfaceListener) {
+        this.onInterfaceListener = onInterfaceListener;
+    }
+
+    public void setOnTimeListener(OnTimeListener onTimeListener) {
+        this.onTimeListener = onTimeListener;
+    }
+
+    public void setOnIpListener(OnIpListener onIpListener) {
+        this.onIpListener = onIpListener;
+    }
+
+    public void setOnRTTListener(OnRTTListener onRTTListener) {
+        this.onRTTListener = onRTTListener;
+    }
+
+    // -------------------------------
 
     @Override
     public void run() {
@@ -59,20 +80,18 @@ public class TCPConnection extends Thread {
             System.out.println("Waiting connection");
             socket = server.accept();
             System.out.println("Accept connection");
-             br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-             bw=new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-
+            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
             while (true) {
 
                 String message = br.readLine();
                 bw.write("Recibido\n");
                 bw.flush();
-                listener.onMessage(message);
+
                 if (message == null) {
                     break;
-                }else if (message.equals("bye")){
-                    byeListener.onBye();
+                } else if (message.equals("bye")) {
                 }
             }
 
@@ -82,36 +101,17 @@ public class TCPConnection extends Thread {
 
     }
 
+    public void subscribe(Application application) {
+        setOnInterfaceListener(application);
+        setOnIpListener(application);
+        setOnRTTListener(application);
+        setOnSpeedListener(application);
+        setOnTimeListener(application);
+        
+    }
+
  
 
-    // OBSERVER
-
-    public void setListener(OnMessageListener listener) {
-        this.listener = listener;
-    }
-
-    public interface OnMessageListener {
-        public void onMessage(String message);
-
-    }
-
-    public interface OnByeListener{
-        public void onBye();
-    }
-
-    public void setOnBye(OnByeListener byeListener) {
-        this.byeListener = byeListener;
-    }
-
-    public void close() throws IOException {
-        try {
-            socket.close();
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-    }
 
 
 }

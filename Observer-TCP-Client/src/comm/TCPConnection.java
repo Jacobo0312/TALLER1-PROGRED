@@ -8,32 +8,33 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
+import app.Application;
+import event.*;
+
 public class TCPConnection extends Thread {
 
-     //Singleton
+    // Singleton
 
-     private static TCPConnection instance=null;
+    private static TCPConnection instance = null;
 
-     private TCPConnection (){}
- 
- 
-     public static synchronized TCPConnection getInstance(){
- 
-         if (instance==null){
-             instance=new TCPConnection();
-         }
-         
-         return instance;
+    private TCPConnection() {
+    }
 
-     }
-     
+    public static synchronized TCPConnection getInstance() {
 
+        if (instance == null) {
+            instance = new TCPConnection();
+        }
 
+        return instance;
+
+    }
+
+    // -------------------------------
 
     private Socket socket;
     private String ip;
     private int port;
-    private OnMessageListener listener;
     BufferedWriter bw;
     BufferedReader br;
 
@@ -50,9 +51,9 @@ public class TCPConnection extends Thread {
         try {
 
             socket = new Socket(ip, port);
-            listener.showMessage("Connect");
+           // listener.showMessage("Connect");
             bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            br=new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,8 +64,8 @@ public class TCPConnection extends Thread {
             try {
                 bw.write(line + "\n");
                 bw.flush();
-                String message=br.readLine();
-                listener.showMessage(message);
+                String message = br.readLine();
+                //listener.showMessage(message);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -74,14 +75,20 @@ public class TCPConnection extends Thread {
 
     // OBSERVER
 
-    public interface OnMessageListener {
-        public void showMessage(String message);
+    public OnSpeedListener onSpeedListener;
+    public OnInterfaceListener onInterfaceListener;
+    public OnTimeListener onTimeListener;
+    public OnIpListener onIpListener;
+    public OnRTTListener onRTTListener;
 
-    }
+    public void subscribe(Application listener) {
 
-    public void setListener(OnMessageListener listener) {
+        this.onInterfaceListener = listener;
+        this.onIpListener = listener;
+        this.onRTTListener = listener;
+        this.onSpeedListener = listener;
+        this.onTimeListener = listener;
 
-        this.listener = listener;
     }
 
     // ----------------------------------------------------
