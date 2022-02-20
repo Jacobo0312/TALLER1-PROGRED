@@ -51,7 +51,7 @@ public class TCPConnection extends Thread {
         try {
 
             socket = new Socket(ip, port);
-           // listener.showMessage("Connect");
+           onMessageListener.showMessage("Connect");
             bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (Exception e) {
@@ -65,7 +65,7 @@ public class TCPConnection extends Thread {
                 bw.write(line + "\n");
                 bw.flush();
                 String message = br.readLine();
-                //listener.showMessage(message);
+                onMessageListener.showMessage(message);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -80,6 +80,7 @@ public class TCPConnection extends Thread {
     public OnTimeListener onTimeListener;
     public OnIpListener onIpListener;
     public OnRTTListener onRTTListener;
+    public OnMessageListener onMessageListener;
 
     public void subscribe(Application listener) {
 
@@ -88,6 +89,7 @@ public class TCPConnection extends Thread {
         this.onRTTListener = listener;
         this.onSpeedListener = listener;
         this.onTimeListener = listener;
+        this.onMessageListener = listener;
 
     }
 

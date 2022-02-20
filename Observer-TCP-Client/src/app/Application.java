@@ -5,7 +5,7 @@ import java.util.Scanner;
 import comm.TCPConnection;
 import event.*;
 
-public class Application implements OnInterfaceListener, OnIpListener, OnRTTListener, OnTimeListener, OnSpeedListener {
+public class Application implements OnInterfaceListener, OnIpListener, OnRTTListener, OnTimeListener, OnSpeedListener,OnMessageListener {
     private Scanner scanner = new Scanner(System.in);
 
     private TCPConnection tcpConnection;
@@ -18,13 +18,13 @@ public class Application implements OnInterfaceListener, OnIpListener, OnRTTList
     }
 
     public void init() {
-        //tcpConnection.start();
+    tcpConnection.start();
 
         while (true) {
             String line = scanner.nextLine();
 
-            if (!commands(line)) System.out.println("\u001B[31m"+"...Invalid command"+"\u001B[37m");
-           // tcpConnection.sendMessage(line);
+            if (!commands(line)) System.out.println("\u001B[31m"+"Invalid command"+"\u001B[37m");
+           else tcpConnection.sendMessage(line);
 
         }
 
@@ -65,24 +65,23 @@ public class Application implements OnInterfaceListener, OnIpListener, OnRTTList
 
         switch (line) {
             case "remoteIpconfig":
-                onIp();
-
+               // onIp();
                 break;
 
             case "interface":
-                OnInterface();
+                //OnInterface();
 
                 break;
 
             case "whatTimeIsIt":
-                OnTime();
+                //OnTime();
                 break;
 
             case "RTT":
-                onRTT();
+                //onRTT();
                 break;
             case "speed":
-                onSpeed();
+                //onSpeed();
                 break;
 
             default:
@@ -90,6 +89,12 @@ public class Application implements OnInterfaceListener, OnIpListener, OnRTTList
                 break;
         }
         return valid;
+    }
+
+    @Override
+    public void showMessage(String line) {
+        System.out.println(line);
+        
     }
 
 }

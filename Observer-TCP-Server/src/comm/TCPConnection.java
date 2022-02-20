@@ -69,6 +69,15 @@ public class TCPConnection extends Thread {
         this.onRTTListener = onRTTListener;
     }
 
+    public void subscribe(Application application) {
+        setOnInterfaceListener(application);
+        setOnIpListener(application);
+        setOnRTTListener(application);
+        setOnSpeedListener(application);
+        setOnTimeListener(application);
+
+    }
+
     // -------------------------------
 
     @Override
@@ -77,23 +86,13 @@ public class TCPConnection extends Thread {
         try {
 
             server = new ServerSocket(port);
-            System.out.println("Waiting connection");
+            System.out.println("\u001B[34m" + "Waiting connection" + "\u001B[37m");
             socket = server.accept();
-            System.out.println("Accept connection");
+            System.out.println("\u001B[32m" + "Accept connection" + "\u001B[37m");
+
+
             br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-
-            while (true) {
-
-                String message = br.readLine();
-                bw.write("Recibido\n");
-                bw.flush();
-
-                if (message == null) {
-                    break;
-                } else if (message.equals("bye")) {
-                }
-            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -101,17 +100,42 @@ public class TCPConnection extends Thread {
 
     }
 
-    public void subscribe(Application application) {
-        setOnInterfaceListener(application);
-        setOnIpListener(application);
-        setOnRTTListener(application);
-        setOnSpeedListener(application);
-        setOnTimeListener(application);
-        
+    public void commands(String line) throws IOException {
+
+        switch (line) {
+            case "remoteIpconfig":
+                onIpListener.onIp();
+                break;
+            case "interface":
+                onInterfaceListener.OnInterface();
+                break;
+
+            case "whatTimeIsIt":
+                onTimeListener.OnTime();
+                break;
+
+            case "RTT":
+                onRTTListener.onRTT();
+                break;
+            case "speed":
+                onSpeedListener.onSpeed();
+                break;
+
+            default:
+                break;
+        }
     }
 
- 
-
-
+    public void sendMessage(String msg) {
+        new Thread(
+                () -> {
+                    try {
+                        bw.write(msg + "\n");
+                        bw.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+    }
 
 }
