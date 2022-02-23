@@ -48,6 +48,11 @@ public class TCPConnection extends Thread {
     public OnTimeListener onTimeListener;
     public OnIpListener onIpListener;
     public OnRTTListener onRTTListener;
+    public OnMessageListener onMessageListener;
+
+    public void setOnMessageListener(OnMessageListener onMessageListener) {
+        this.onMessageListener = onMessageListener;
+    }
 
     public void setOnSpeedListener(OnSpeedListener onSpeedListener) {
         this.onSpeedListener = onSpeedListener;
@@ -75,6 +80,7 @@ public class TCPConnection extends Thread {
         setOnRTTListener(application);
         setOnSpeedListener(application);
         setOnTimeListener(application);
+        setOnMessageListener(application);
 
     }
 
@@ -83,20 +89,33 @@ public class TCPConnection extends Thread {
     @Override
     public void run() {
 
-        try {
+        while (true) {
 
-            server = new ServerSocket(port);
-            System.out.println("\u001B[34m" + "Waiting connection" + "\u001B[37m");
-            socket = server.accept();
-            System.out.println("\u001B[32m" + "Accept connection" + "\u001B[37m");
+            try {
+                handshake();
+                String message = br.readLine();
+                commands(message);
+            } catch (IOException e) {
 
+                try {
+                    server.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
 
-            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+    }
+
+    public void handshake() throws IOException {
+
+        server = new ServerSocket(port);
+        onMessageListener.showMessage("\u001B[34m" + "Waiting connection" + "\u001B[37m");
+        socket = server.accept();
+        onMessageListener.showMessage("\u001B[32m" + "Accept connection" + "\u001B[37m");
+
+        br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
     }
 
@@ -122,6 +141,7 @@ public class TCPConnection extends Thread {
                 break;
 
             default:
+                sendMessage("\u001B[31m" + "Invalid command" + "\u001B[37m");
                 break;
         }
     }

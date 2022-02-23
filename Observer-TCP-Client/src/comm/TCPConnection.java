@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import app.Application;
 import event.*;
@@ -37,6 +38,7 @@ public class TCPConnection extends Thread {
     private int port;
     BufferedWriter bw;
     BufferedReader br;
+    boolean conn=false;
 
     public void setPort(int port) {
         this.port = port;
@@ -48,15 +50,28 @@ public class TCPConnection extends Thread {
 
     @Override
     public void run() {
-        try {
 
-            socket = new Socket(ip, port);
-           onMessageListener.showMessage("Connect");
-            bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        
+      while (!conn) {
+          try {
+              handshake();
+        conn=true;
+          } catch (Exception e) {
+              onMessageListener.showMessage("\u001B[34m" + "Waiting connection" + "\u001B[37m");
+          }
+      }
+      
+
+
+
+    }
+
+    public void handshake() throws UnknownHostException, IOException {
+        socket = new Socket(ip, port);
+        onMessageListener.showMessage("Connect");
+        bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        conn=true;
     }
 
     public void sendMessage(String line) {

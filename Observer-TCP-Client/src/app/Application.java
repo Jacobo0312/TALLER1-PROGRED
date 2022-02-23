@@ -23,8 +23,7 @@ public class Application implements OnInterfaceListener, OnIpListener, OnRTTList
         while (true) {
             String line = scanner.nextLine();
 
-            if (!commands(line)) System.out.println("\u001B[31m"+"Invalid command"+"\u001B[37m");
-           else tcpConnection.sendMessage(line);
+            tcpConnection.sendMessage(line);
 
         }
 
