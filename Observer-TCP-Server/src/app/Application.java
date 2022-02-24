@@ -5,7 +5,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.Calendar;
 
 import comm.TCPConnection;
@@ -23,15 +22,13 @@ public class Application implements OnInterfaceListener,OnIpListener,OnRTTListen
 
     public void init() {
         tcpConnection.start();
-        tcpConnection.setPort(5000);
-        
+        tcpConnection.setPort(5050);
     }
 
 
     @Override
-    public void onSpeed() {
-        byte[] x=new byte[1024];
-        System.out.println("Speed");
+    public void onSpeed(String msg) {
+        tcpConnection.sendMessage(msg);
                 
     }
 
@@ -43,9 +40,9 @@ public class Application implements OnInterfaceListener,OnIpListener,OnRTTListen
 
 
     @Override
-    public void onRTT() {
-        byte[] x=new byte[1024];
-        System.out.println(x.toString());        
+    public void onRTT(String msg) {
+     tcpConnection.sendMessage(msg);
+
     }
 
 

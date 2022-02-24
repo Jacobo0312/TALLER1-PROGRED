@@ -1,6 +1,6 @@
 package event;
 
 public interface OnSpeedListener {
-    public void onSpeed();
+    public void onSpeed(String line);
     
 }

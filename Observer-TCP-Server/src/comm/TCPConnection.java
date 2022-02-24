@@ -94,7 +94,10 @@ public class TCPConnection extends Thread {
             try {
                 handshake();
                 String message = br.readLine();
-                commands(message);
+                if (message !=null){
+                    commands(message);
+                }
+               
             } catch (IOException e) {
 
                 try {
@@ -120,6 +123,15 @@ public class TCPConnection extends Thread {
     }
 
     public void commands(String line) throws IOException {
+        String message="";
+
+
+
+        if (line.contains(":")){
+            String [] split=line.split(":");
+            line=split[0];
+            message=split[1];
+        }
 
         switch (line) {
             case "remoteIpconfig":
@@ -128,16 +140,14 @@ public class TCPConnection extends Thread {
             case "interface":
                 onInterfaceListener.OnInterface();
                 break;
-
             case "whatTimeIsIt":
                 onTimeListener.OnTime();
                 break;
-
             case "RTT":
-                onRTTListener.onRTT();
+                onRTTListener.onRTT(message);
                 break;
             case "speed":
-                onSpeedListener.onSpeed();
+                onSpeedListener.onSpeed(message);
                 break;
 
             default:
@@ -157,5 +167,10 @@ public class TCPConnection extends Thread {
                     }
                 }).start();
     }
+
+
+
+
+
 
 }

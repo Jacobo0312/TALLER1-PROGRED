@@ -39,6 +39,7 @@ public class TCPConnection extends Thread {
     BufferedWriter bw;
     BufferedReader br;
     boolean conn=false;
+    long time=0;
 
     public void setPort(int port) {
         this.port = port;
@@ -48,21 +49,24 @@ public class TCPConnection extends Thread {
         this.ip = ip;
     }
 
+    public long getTime(){
+        return this.time;
+    }
+
     @Override
     public void run() {
 
+        while (!conn) {
+            try {
+                handshake();
+            } catch (UnknownHostException e) {
+                conn=false;
+            } catch (IOException e) {
+                conn=false;
+            }
+        }
+
         
-      while (!conn) {
-          try {
-              handshake();
-        conn=true;
-          } catch (Exception e) {
-              onMessageListener.showMessage("\u001B[34m" + "Waiting connection" + "\u001B[37m");
-          }
-      }
-      
-
-
 
     }
 
@@ -80,30 +84,31 @@ public class TCPConnection extends Thread {
                 bw.write(line + "\n");
                 bw.flush();
                 String message = br.readLine();
-                onMessageListener.showMessage(message);
+                if(line.length()<100){
+                    onMessageListener.showMessage(message);
+                }
+                time=System.currentTimeMillis();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            try {
+                socket.close();
+                handshake();
+            } catch (IOException e) {
+                //e.printStackTrace();
+
+            }
+            conn=false;
         }).start();
 
     }
 
     // OBSERVER
 
-    public OnSpeedListener onSpeedListener;
-    public OnInterfaceListener onInterfaceListener;
-    public OnTimeListener onTimeListener;
-    public OnIpListener onIpListener;
-    public OnRTTListener onRTTListener;
     public OnMessageListener onMessageListener;
 
     public void subscribe(Application listener) {
 
-        this.onInterfaceListener = listener;
-        this.onIpListener = listener;
-        this.onRTTListener = listener;
-        this.onSpeedListener = listener;
-        this.onTimeListener = listener;
         this.onMessageListener = listener;
 
     }
